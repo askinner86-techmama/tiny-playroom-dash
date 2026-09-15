@@ -6,31 +6,39 @@
 <title>Tiny Playroom Dash</title>
 <style>
 html,body{margin:0;height:100%;overflow:hidden;background:#1b120c;font-family:Trebuchet MS,Segoe UI,sans-serif;touch-action:none}
-#app{position:relative;width:100%;height:100%}
-canvas{display:block;width:100%;height:100%;background:#87c6ea}
-.panel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px;background:linear-gradient(180deg,rgba(255,244,216,.16),rgba(27,18,12,.28))}
+#app{position:relative;width:100%;height:100%;background:#1b120c}
+canvas{display:block;width:100%;height:100%;object-fit:contain;background:#1b120c}
+.panel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:max(16px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));background:rgba(27,18,12,.78);overflow:auto;-webkit-overflow-scrolling:touch}
+.sheet{width:min(420px,94vw);background:#fff6e4;color:#3a2414;border-radius:22px;padding:20px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 10px 0 rgba(0,0,0,.28)}
 .hidden{display:none!important}
-h1,h2,.tagline,.hint,.pick-label,.over-score{color:#fff8e8;text-align:center;text-shadow:0 2px 0 #9a4d1d}
-h1{font-size:42px;margin:0}
+h1{font-size:clamp(28px,8vw,42px);margin:0;color:#fff8e8;text-align:center;text-shadow:0 2px 0 #9a4d1d}
+h2,.sheet h2{margin:0;font-size:28px;color:#7a3212;text-align:center}
+.tagline,.hint,.pick-label,.over-score{text-align:center}
+.sheet .tagline,.sheet .hint,.sheet .pick-label,.sheet .over-score{color:#3a2414;text-shadow:none}
 .eyebrow{background:rgba(255,244,216,.85);color:#5b3518;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700}
-.char-row,.btn-row,.initials{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.char-row,.btn-row,.initials{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
 .char-card,.btn,.init-cell,.hud-chip,.icon-btn,.touch-btn{border:0;cursor:pointer;font-weight:800;font-family:inherit}
-.char-card{background:#fff8e8;border:4px solid #fff;border-radius:18px;padding:16px 22px;min-width:140px}
+.char-card{background:#fff8e8;border:4px solid #fff;border-radius:18px;padding:16px 22px;min-width:120px}
 .char-card.selected{border-color:#ef6b4a}
-.btn{border-radius:999px;padding:12px 24px;font-size:18px}
+.btn{border-radius:999px;padding:14px 24px;font-size:18px;min-height:48px}
 .primary{background:#ef6b4a;color:#fff8e8}
 .ghost{background:#fff8e8;color:#3a2414}
-#hud{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
+#hud{position:absolute;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;z-index:3}
 .hud-chip,.icon-btn{pointer-events:auto;background:#fff8e8;border-radius:12px;padding:6px 12px}
-#touchLayer{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:space-between;padding:0 16px;pointer-events:none}
-.touch-btn{pointer-events:auto;width:90px;height:90px;border-radius:50%;background:rgba(255,248,232,.8)}
-.score-list{width:min(420px,92vw);background:#fff8e8;border-radius:16px;padding:10px 16px;list-style:none}
+#touchLayer{position:absolute;left:0;right:0;bottom:max(12px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;padding:0 16px;pointer-events:none;z-index:3}
+.touch-btn{pointer-events:auto;width:84px;height:84px;border-radius:50%;background:rgba(255,248,232,.88)}
+.score-list{width:100%;background:#fff8e8;border-radius:16px;padding:10px 16px;list-style:none;margin:0}
 .score-list li{display:grid;grid-template-columns:32px 80px 1fr;padding:8px 0;font-weight:800}
-.init-cell{width:58px;height:64px;border-radius:12px;background:#fff8e8;font-size:28px}
-.how-card{width:min(520px,94vw);background:rgba(255,248,232,.94);color:#3a2414;border-radius:16px;padding:16px;min-height:140px}
+.init-cell{width:58px;height:64px;border-radius:12px;background:#fff;border:3px solid #efd7b0;font-size:28px}
+.how-card{width:100%;background:#fff;color:#3a2414;border-radius:16px;padding:14px;min-height:120px}
 .how-card h3{margin:0 0 8px;color:#7a3212}
 .how-step{color:#ef6b4a;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.tip-banner{position:absolute;left:50%;top:72px;transform:translateX(-50%);background:rgba(255,248,232,.94);color:#3a2414;font-weight:800;padding:8px 16px;border-radius:999px;pointer-events:none;text-align:center;max-width:86vw}
+.tip-banner{position:absolute;left:50%;top:72px;transform:translateX(-50%);background:rgba(255,248,232,.94);color:#3a2414;font-weight:800;padding:8px 16px;border-radius:999px;pointer-events:none;text-align:center;max-width:86vw;z-index:3}
+@media (max-width:700px){
+  .btn{width:100%;max-width:280px}
+  .btn-row{flex-direction:column;align-items:center}
+  .touch-btn{width:72px;height:72px}
+}
 </style>
 </head>
 <body>
@@ -42,6 +50,7 @@ h1{font-size:42px;margin:0}
 <section id="screenMenu" class="panel">
 <p class="eyebrow">You've been shrunk to ant size</p>
 <h1>Tiny Playroom Dash</h1>
+<div class="sheet">
 <p class="tagline">Jump the toys. Grab the marbles.</p>
 <p class="pick-label">Choose a runner</p>
 <div class="char-row">
@@ -53,9 +62,11 @@ h1{font-size:42px;margin:0}
 <button id="btnHow" class="btn ghost" type="button">How to Play</button>
 <button id="btnScores" class="btn ghost" type="button">Top 10</button>
 </div>
-<p class="hint">Space/JUMP · double-jump · SLIDE</p>
+<p class="hint">Space / JUMP · double-jump · SLIDE</p>
+</div>
 </section>
 <section id="screenHow" class="panel hidden">
+<div class="sheet">
 <h2>How to Play</h2>
 <p id="howStep" class="pick-label">Tip 1 of 5</p>
 <div id="howBody" class="how-card"></div>
@@ -64,10 +75,26 @@ h1{font-size:42px;margin:0}
 <button id="btnHowNext" class="btn primary" type="button">Next</button>
 <button id="btnPractice" class="btn ghost" type="button">Practice Run</button>
 </div>
+</div>
 </section>
-<section id="screenScores" class="panel hidden"><h2>Top 10 Runners</h2><ol id="scoreList" class="score-list"></ol><button id="btnScoresBack" class="btn primary" type="button">Back</button></section>
-<section id="screenPause" class="panel hidden"><h2>Paused</h2><div class="btn-row"><button id="btnResume" class="btn primary" type="button">Resume</button><button id="btnQuit" class="btn ghost" type="button">Quit</button></div></section>
+<section id="screenScores" class="panel hidden">
+<div class="sheet">
+<h2>Top 10 Runners</h2>
+<ol id="scoreList" class="score-list"></ol>
+<button id="btnScoresBack" class="btn primary" type="button">Back</button>
+</div>
+</section>
+<section id="screenPause" class="panel hidden">
+<div class="sheet">
+<h2>Paused</h2>
+<div class="btn-row">
+<button id="btnResume" class="btn primary" type="button">Resume</button>
+<button id="btnQuit" class="btn ghost" type="button">Quit</button>
+</div>
+</div>
+</section>
 <section id="screenOver" class="panel hidden">
+<div class="sheet">
 <h2>Squished!</h2>
 <p class="over-score">Score <strong id="overScore">0</strong></p>
 <p id="overMsg" class="tagline"></p>
@@ -76,7 +103,11 @@ h1{font-size:42px;margin:0}
 <div class="initials"><button class="init-cell" data-i="0" type="button">A</button><button class="init-cell" data-i="1" type="button">A</button><button class="init-cell" data-i="2" type="button">A</button></div>
 <button id="btnSaveScore" class="btn primary" type="button">Save Score</button>
 </div>
-<div class="btn-row"><button id="btnAgain" class="btn primary" type="button">Run Again</button><button id="btnMenu" class="btn ghost" type="button">Menu</button></div>
+<div class="btn-row">
+<button id="btnAgain" class="btn primary" type="button">Run Again</button>
+<button id="btnMenu" class="btn ghost" type="button">Menu</button>
+</div>
+</div>
 </section>
 </div>
 <script src="game.js"></script>
